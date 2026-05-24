@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Consolas, 'Courier New', monospace;
+  background-color: #0a0a0b;
+  color: #e8e8ec;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a30;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a42;
+}
+
+::selection {
+  background: rgba(245, 158, 11, 0.3);
+  color: #e8e8ec;
+}
+
+input[type="number"],
+textarea {
+  font-family: 'Outfit', sans-serif;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.3;
+}
+
+@layer components {
+  .section-label {
+    @apply text-[11px] font-mono font-medium uppercase tracking-widest text-txt-tertiary mb-3;
+  }
+
+  .control-surface {
+    @apply bg-surface-2 border border-edge rounded-lg;
+  }
+
+  .btn-ghost {
+    @apply px-3 py-1.5 text-sm font-medium text-txt-secondary rounded-md
+           hover:text-txt-primary hover:bg-surface-4 transition-colors duration-150;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 text-sm font-semibold text-txt-inverse bg-amber rounded-md
+           hover:bg-amber-bright transition-colors duration-150;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-surface-3 border border-edge rounded-lg
+           text-sm text-txt-primary placeholder-txt-tertiary
+           focus:outline-none focus:border-amber focus:ring-1 focus:ring-amber/30
+           transition-colors duration-150;
+  }
+}

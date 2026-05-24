@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+  background-color: #09090b;
+  color: #fafafa;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: inherit;
+}
+
+select {
+  font-family: inherit;
+}
+
+::selection {
+  background-color: rgba(245, 158, 11, 0.3);
+  color: #fafafa;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+@layer components {
+  .dark-card {
+    @apply bg-surface-card border border-surface-border rounded-xl;
+  }
+
+  .dark-input {
+    @apply bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-text-primary
+           focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30
+           placeholder:text-text-muted transition-colors;
+  }
+}

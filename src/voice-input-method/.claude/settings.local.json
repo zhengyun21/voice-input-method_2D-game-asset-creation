@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx patch-package *)",
+      "Bash(npx tsc *)",
+      "WebSearch",
+      "WebFetch(domain:global.xfyun.cn)"
+    ]
+  }
+}
