@@ -1,4 +1,4 @@
-export type Language = 'zh' | 'en';
+export type Language = "zh" | "en" | "ja" | "fr" | "ko";
 
 export interface Transcript {
   id: string;
@@ -29,7 +29,7 @@ export interface TranslationState {
   error: string | null;
 }
 
-export type RecognitionMode = 'realtime' | 'offline';
+export type RecognitionMode = "realtime" | "offline";
 
 export interface LanguageOption {
   code: Language;
@@ -37,6 +37,14 @@ export interface LanguageOption {
 }
 
 export const LANGUAGES: LanguageOption[] = [
-  { code: 'zh', label: '中文' },
-  { code: 'en', label: 'English' },
+  { code: "zh", label: "中文" },
+  { code: "en", label: "English" },
+];
+
+export const TARGET_LANGUAGES: LanguageOption[] = [
+  { code: "zh", label: "中文" },
+  { code: "en", label: "English" },
+  { code: "ja", label: "日本語" },
+  { code: "fr", label: "Français" },
+  { code: "ko", label: "한국어" },
 ];
