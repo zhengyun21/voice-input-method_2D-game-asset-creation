@@ -12,6 +12,7 @@ export const deepseekApi = {
     text: string,
     sourceLang: Language,
     targetLang: Language,
+    signal?: AbortSignal,
   ): Promise<string> => {
     if (!DEEPSEEK_API_URL) {
       throw new Error("DeepSeek API URL not configured");
@@ -47,10 +48,14 @@ export const deepseekApi = {
             Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
             "Content-Type": "application/json",
           },
+          signal,
         },
       );
       return response.data.choices[0]?.message?.content || text;
     } catch (error) {
+      if (axios.isCancel(error) || (error as any)?.code === "ERR_CANCELED") {
+        throw new DOMException("Aborted", "AbortError");
+      }
       console.error("Translation error:", error);
       throw new Error("翻译失败，请重试");
     }
@@ -59,6 +64,7 @@ export const deepseekApi = {
   translateAuto: async (
     text: string,
     targetLang: Language,
+    signal?: AbortSignal,
   ): Promise<string> => {
     if (!DEEPSEEK_API_URL) {
       throw new Error("DeepSeek API URL not configured");
@@ -94,10 +100,14 @@ export const deepseekApi = {
             Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
             "Content-Type": "application/json",
           },
+          signal,
         },
       );
       return response.data.choices[0]?.message?.content || text;
     } catch (error) {
+      if (axios.isCancel(error) || (error as any)?.code === "ERR_CANCELED") {
+        throw new DOMException("Aborted", "AbortError");
+      }
       console.error("Translation error:", error);
       throw new Error("翻译失败，请重试");
     }

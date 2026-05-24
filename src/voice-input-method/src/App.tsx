@@ -36,10 +36,16 @@ function App() {
   useEffect(() => {
     if (enableVoiceTranslation && transcript) {
       translate(transcript, sourceLanguage, targetLanguage);
-    } else if (!transcript || !enableVoiceTranslation) {
+    } else if (enableVoiceTranslation && !transcript) {
       clearTranslation();
     }
   }, [transcript, sourceLanguage, targetLanguage, enableVoiceTranslation, translate, clearTranslation]);
+
+  useEffect(() => {
+    if (!enableVoiceTranslation) {
+      clearTranslation();
+    }
+  }, [enableVoiceTranslation, clearTranslation]);
 
   const handleManualTranslate = useCallback((text: string) => {
     autoTranslate(text, targetLanguage);

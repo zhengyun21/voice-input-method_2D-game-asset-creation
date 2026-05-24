@@ -344,6 +344,8 @@ export class XfyunVoiceRecognizer {
     if (this.callbacks.onStop) {
       this.callbacks.onStop();
     }
+    // 重置状态为 idle，以便下次可以重新启动
+    this.setState('idle');
   }
 
   public destroy() {

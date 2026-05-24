@@ -31,6 +31,7 @@ export const useVoiceRecognition = () => {
       onStart: () => {
         setIsRecording(true);
         setDuration(0);
+        setTranscript(''); // 录音真正开始时清空 transcript
         timerRef.current = window.setInterval(() => {
           setDuration(prev => prev + 1);
         }, 1000);
@@ -73,7 +74,6 @@ export const useVoiceRecognition = () => {
   const startRecording = useCallback(async () => {
     try {
       setError(null);
-      setTranscript('');
       isStoppingRef.current = false;
       
       const recognizer = recognizerRef.current;
