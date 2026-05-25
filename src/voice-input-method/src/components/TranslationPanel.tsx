@@ -54,7 +54,14 @@ export const TranslationPanel = ({
         </div>
       </div>
       <div className="p-4">
-        {isTranslating ? (
+        {translation ? (
+          <div className="text-text-primary text-sm leading-relaxed whitespace-pre-wrap animate-fade-in-up">
+            {translation}
+            {isTranslating && (
+              <span className="inline-block w-0.5 h-4 bg-accent ml-0.5 align-text-bottom animate-blink-cursor" />
+            )}
+          </div>
+        ) : isTranslating ? (
           <div className="flex justify-center py-10">
             <div className="flex items-center gap-1.5">
               {[0, 1, 2, 3, 4].map((i) => (
@@ -65,10 +72,6 @@ export const TranslationPanel = ({
                 />
               ))}
             </div>
-          </div>
-        ) : translation ? (
-          <div className="text-text-primary text-sm leading-relaxed whitespace-pre-wrap animate-fade-in-up">
-            {translation}
           </div>
         ) : (
           <div className="text-center py-10">

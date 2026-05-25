@@ -31,10 +31,18 @@ export const useTranslation = () => {
     try {
       setIsTranslating(true);
       setError(null);
-      const result = await deepseekApi.translate(text, sourceLang, targetLang, controller.signal);
-      if (!controller.signal.aborted) {
-        setTranslation(result);
-      }
+      setTranslation('');
+      await deepseekApi.translateStream(
+        text,
+        sourceLang,
+        targetLang,
+        (token) => {
+          if (!controller.signal.aborted) {
+            setTranslation(prev => prev + token);
+          }
+        },
+        controller.signal,
+      );
     } catch (err) {
       if (controller.signal.aborted) return;
       setError(err instanceof Error ? err.message : '翻译失败');
@@ -63,21 +71,19 @@ export const useTranslation = () => {
     try {
       setIsTranslating(true);
       setError(null);
+      setTranslation('');
 
-      const result = await deepseekApi.translateAutoChunked(
+      await deepseekApi.translateAutoStreamChunked(
         text,
         targetLang,
-        controller.signal,
-        (partial) => {
+        (token) => {
           if (!controller.signal.aborted) {
-            setTranslation(partial);
+            setTranslation(prev => prev + token);
           }
         },
+        controller.signal,
         sourceLang,
       );
-      if (!controller.signal.aborted) {
-        setTranslation(result);
-      }
     } catch (err) {
       if (controller.signal.aborted) return;
       setError(err instanceof Error ? err.message : '翻译失败');

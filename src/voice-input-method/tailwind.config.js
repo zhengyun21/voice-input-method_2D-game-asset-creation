@@ -46,6 +46,10 @@ export default {
           "0%, 80%, 100%": { opacity: "0.2" },
           "40%": { opacity: "1" },
         },
+        "blink-cursor": {
+          "0%, 100%": { opacity: "0" },
+          "50%": { opacity: "1" },
+        },
       },
       animation: {
         "pulse-ring":
@@ -53,6 +57,7 @@ export default {
         "wave-bar": "wave-bar 1.2s ease-in-out infinite",
         "fade-in-up": "fade-in-up 0.5s ease-out forwards",
         "dot-pulse": "dot-pulse 1.4s ease-in-out infinite",
+        "blink-cursor": "blink-cursor 1s step-end infinite",
       },
     },
   },
