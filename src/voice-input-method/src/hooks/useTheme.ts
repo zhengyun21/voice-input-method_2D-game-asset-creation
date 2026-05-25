@@ -1,24 +1,25 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
-type Theme = 'dark' | 'light';
+type Theme = "dark" | "light";
 
 function getSystemTheme(): Theme {
-  if (window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
-  return 'dark';
+  if (window.matchMedia("(prefers-color-scheme: light)").matches)
+    return "light";
+  return "dark";
 }
 
 function getStoredTheme(): Theme {
-  const stored = localStorage.getItem('theme');
-  if (stored === 'light' || stored === 'dark') return stored;
+  const stored = localStorage.getItem("theme");
+  if (stored === "light" || stored === "dark") return stored;
   return getSystemTheme();
 }
 
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
-  if (theme === 'dark') {
-    root.classList.add('dark');
+  if (theme === "dark") {
+    root.classList.add("dark");
   } else {
-    root.classList.remove('dark');
+    root.classList.remove("dark");
   }
 }
 
@@ -27,14 +28,14 @@ export const useTheme = () => {
 
   useEffect(() => {
     applyTheme(theme);
-    localStorage.setItem('theme', theme);
+    localStorage.setItem("theme", theme);
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   }, []);
 
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
 
   return { theme, isDark, toggleTheme };
 };

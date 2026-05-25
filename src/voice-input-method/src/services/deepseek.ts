@@ -6,6 +6,61 @@ import type { Language } from "../types";
 const DEEPSEEK_API_URL = import.meta.env.VITE_DEEPSEEK_API_URL;
 const DEEPSEEK_MODEL = import.meta.env.VITE_DEEPSEEK_MODEL;
 const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY;
+const DEEPSEEK_MAX_TOKENS = Number(import.meta.env.VITE_DEEPSEEK_MAX_TOKENS) || 8192;
+
+const CHUNK_MAX_CHARS = 4000;
+
+export function splitTextIntoChunks(
+  text: string,
+  maxChars: number = CHUNK_MAX_CHARS,
+): string[] {
+  const paragraphs = text.split(/\n\n+/);
+  const chunks: string[] = [];
+  let currentChunk = "";
+
+  for (const paragraph of paragraphs) {
+    if (paragraph.length > maxChars) {
+      if (currentChunk.trim()) {
+        chunks.push(currentChunk.trim());
+        currentChunk = "";
+      }
+      const lines = paragraph.split(/\n/);
+      for (const line of lines) {
+        if (line.length > maxChars) {
+          const sentences = line.split(/(?<=[。！？.!?])/);
+          for (const sentence of sentences) {
+            if ((currentChunk + "\n" + sentence).trim().length > maxChars) {
+              if (currentChunk.trim()) chunks.push(currentChunk.trim());
+              currentChunk = sentence;
+            } else {
+              currentChunk = currentChunk
+                ? currentChunk + "\n" + sentence
+                : sentence;
+            }
+          }
+        } else if ((currentChunk + "\n" + line).trim().length > maxChars) {
+          if (currentChunk.trim()) chunks.push(currentChunk.trim());
+          currentChunk = line;
+        } else {
+          currentChunk = currentChunk ? currentChunk + "\n" + line : line;
+        }
+      }
+    } else if ((currentChunk + "\n\n" + paragraph).trim().length > maxChars) {
+      if (currentChunk.trim()) chunks.push(currentChunk.trim());
+      currentChunk = paragraph;
+    } else {
+      currentChunk = currentChunk
+        ? currentChunk + "\n\n" + paragraph
+        : paragraph;
+    }
+  }
+
+  if (currentChunk.trim()) {
+    chunks.push(currentChunk.trim());
+  }
+
+  return chunks.length > 0 ? chunks : [text];
+}
 
 export const deepseekApi = {
   translate: async (
@@ -26,12 +81,11 @@ export const deepseekApi = {
 
     const langNames: Record<Language, string> = {
       zh: "中文",
-      en: "English",
-      ja: "日本語",
-      fr: "Français",
-      ko: "한국어",
+      en: "英语",
+      ja: "日语",
+      fr: "法语",
+      ko: "韩语",
     };
-    const targetLangName = langNames[targetLang];
 
     try {
       const response = await axios.post(
@@ -41,7 +95,11 @@ export const deepseekApi = {
           messages: [
             {
               role: "system",
-              content: `你是一个翻译助手。请将以下文本从${sourceLang === "zh" ? "中文" : "English"}翻译成${targetLangName}。`,
+              content: `你是一个专业翻译助手，你需要遵循以下重要规则：
+                        1. 仅输出翻译结果，不要添加任何解释、说明或原文。
+                        2. 仅纯数学公式（如 $E=mc^2$）和独立的数字保持原样。对话、描述、说明等自然语言内容必须完整翻译。
+                        3. 保持原文的段落结构和格式。
+                        请将以下文本从${langNames[sourceLang]}翻译成${langNames[targetLang]}。`,
             },
             {
               role: "user",
@@ -49,6 +107,7 @@ export const deepseekApi = {
             },
           ],
           temperature: 0.3,
+          max_tokens: DEEPSEEK_MAX_TOKENS,
         },
         {
           headers: {
@@ -58,7 +117,11 @@ export const deepseekApi = {
           signal,
         },
       );
-      return response.data.choices[0]?.message?.content || text;
+      const content = response.data.choices[0]?.message?.content;
+      if (!content || content.trim() === "") {
+        throw new Error("翻译失败：API 返回了空响应，请重试");
+      }
+      return content;
     } catch (error) {
       if (axios.isCancel(error) || (error as any)?.code === "ERR_CANCELED") {
         throw new DOMException("Aborted", "AbortError");
@@ -72,6 +135,7 @@ export const deepseekApi = {
     text: string,
     targetLang: Language,
     signal?: AbortSignal,
+    sourceLang?: Language,
   ): Promise<string> => {
     if (!DEEPSEEK_API_URL) {
       throw new Error("DeepSeek API URL not configured");
@@ -85,12 +149,14 @@ export const deepseekApi = {
 
     const langNames: Record<Language, string> = {
       zh: "中文",
-      en: "English",
-      ja: "日本語",
-      fr: "Français",
-      ko: "한국어",
+      en: "英语",
+      ja: "日语",
+      fr: "法语",
+      ko: "韩语",
     };
     const targetLangName = langNames[targetLang];
+
+    const sourcePart = sourceLang ? `从${langNames[sourceLang]}` : "从中文";
 
     try {
       const response = await axios.post(
@@ -100,14 +166,15 @@ export const deepseekApi = {
           messages: [
             {
               role: "system",
-              content: `你是一个专业翻译助手。请直接将用户输入的文本翻译成${targetLangName}，仅返回翻译结果，不要添加任何额外解释或说明。`,
+              content: `你是一个专业翻译助手。请将以下文本${sourcePart}翻译成${targetLangName}。重要规则：1. 仅输出翻译结果，不要添加任何解释、说明或原文。2. 仅纯数学公式（如 $E=mc^2$）和独立的数字保持原样。对话、描述、说明等自然语言内容必须完整翻译。3. 保持原文的段落结构和格式。`,
             },
             {
               role: "user",
               content: text,
             },
           ],
-          temperature: 0.3,
+          temperature: 0.8,
+          max_tokens: DEEPSEEK_MAX_TOKENS,
         },
         {
           headers: {
@@ -117,7 +184,11 @@ export const deepseekApi = {
           signal,
         },
       );
-      return response.data.choices[0]?.message?.content || text;
+      const content = response.data.choices[0]?.message?.content;
+      if (!content || content.trim() === "") {
+        throw new Error("翻译失败：API 返回了空响应，请重试");
+      }
+      return content;
     } catch (error) {
       if (axios.isCancel(error) || (error as any)?.code === "ERR_CANCELED") {
         throw new DOMException("Aborted", "AbortError");
@@ -125,5 +196,54 @@ export const deepseekApi = {
       console.error("Translation error:", error);
       throw new Error("翻译失败，请重试");
     }
+  },
+
+  translateAutoChunked: async (
+    text: string,
+    targetLang: Language,
+    signal?: AbortSignal,
+    onPartialResult?: (partialTranslation: string) => void,
+    sourceLang?: Language,
+  ): Promise<string> => {
+    const chunks = splitTextIntoChunks(text, CHUNK_MAX_CHARS);
+    if (chunks.length === 1) {
+      return deepseekApi.translateAuto(
+        chunks[0],
+        targetLang,
+        signal,
+        sourceLang,
+      );
+    }
+
+    const translatedChunks: string[] = [];
+    let previousContext = "";
+
+    for (let i = 0; i < chunks.length; i++) {
+      if (signal?.aborted) {
+        throw new DOMException("Aborted", "AbortError");
+      }
+
+      const chunk = chunks[i];
+      const hasContext = i > 0 && previousContext.length > 0;
+      const textWithContext = hasContext
+        ? `参考上下文翻译：\n${previousContext}\n\n需要翻译的内容：\n${chunk}`
+        : chunk;
+
+      const translated = await deepseekApi.translateAuto(
+        textWithContext,
+        targetLang,
+        signal,
+        sourceLang,
+      );
+      translatedChunks.push(translated);
+
+      previousContext = chunk.slice(-1000);
+
+      if (onPartialResult) {
+        onPartialResult(translatedChunks.join("\n\n"));
+      }
+    }
+
+    return translatedChunks.join("\n\n");
   },
 };

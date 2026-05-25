@@ -48,7 +48,8 @@ export const useTranslation = () => {
 
   const autoTranslate = useCallback(async (
     text: string,
-    targetLang: Language
+    targetLang: Language,
+    sourceLang?: Language,
   ) => {
     if (!text.trim()) {
       setTranslation('');
@@ -62,7 +63,18 @@ export const useTranslation = () => {
     try {
       setIsTranslating(true);
       setError(null);
-      const result = await deepseekApi.translateAuto(text, targetLang, controller.signal);
+
+      const result = await deepseekApi.translateAutoChunked(
+        text,
+        targetLang,
+        controller.signal,
+        (partial) => {
+          if (!controller.signal.aborted) {
+            setTranslation(partial);
+          }
+        },
+        sourceLang,
+      );
       if (!controller.signal.aborted) {
         setTranslation(result);
       }

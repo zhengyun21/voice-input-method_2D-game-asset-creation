@@ -13,7 +13,6 @@ export const DocumentTranslationPage = () => {
   const [extractedText, setExtractedText] = useState('');
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractError, setExtractError] = useState<string | null>(null);
-  const [showFullText, setShowFullText] = useState(false);
 
   const {
     isTranslating,
@@ -33,15 +32,12 @@ export const DocumentTranslationPage = () => {
     try {
       const text = await parseDocument(selectedFile);
       setExtractedText(text);
-      if (text.trim()) {
-        autoTranslate(text, targetLanguage);
-      }
     } catch (err) {
       setExtractError(err instanceof Error ? err.message : '文件解析失败');
     } finally {
       setIsExtracting(false);
     }
-  }, [targetLanguage, autoTranslate, clearTranslation]);
+  }, [clearTranslation]);
 
   const handleRemoveFile = useCallback(() => {
     setFile(null);
@@ -50,12 +46,21 @@ export const DocumentTranslationPage = () => {
     clearTranslation();
   }, [clearTranslation]);
 
+  const handleConfirmTranslate = useCallback(() => {
+    if (extractedText.trim()) {
+      autoTranslate(extractedText, targetLanguage, sourceLanguage);
+    }
+  }, [extractedText, targetLanguage, sourceLanguage, autoTranslate]);
+
   const handleTargetChange = useCallback((lang: Language) => {
     setTargetLanguage(lang);
-    if (extractedText.trim()) {
-      autoTranslate(extractedText, lang);
+    if (translation) {
+      setFile(null);
+      setExtractedText('');
+      setExtractError(null);
+      clearTranslation();
     }
-  }, [extractedText, autoTranslate]);
+  }, [translation, clearTranslation]);
 
   return (
     <TranslationPageLayout
@@ -108,24 +113,26 @@ export const DocumentTranslationPage = () => {
             )}
 
             {extractedText && !isExtracting && (
-              <div className="dark-card">
-                <div className="flex items-center justify-between px-4 py-2.5 border-b border-surface-border-subtle">
-                  <span className="text-xs font-medium text-text-secondary uppercase tracking-wider">提取文本</span>
-                  <button
-                    onClick={() => setShowFullText(!showFullText)}
-                    className="px-2.5 py-1 text-xs text-text-muted hover:text-text-secondary hover:bg-surface-elevated rounded-md transition-colors"
-                  >
-                    {showFullText ? '收起' : '展开全部'}
-                  </button>
-                </div>
-                <div className="p-4">
-                  <div className={`text-text-primary text-sm leading-relaxed whitespace-pre-wrap ${
-                    !showFullText ? 'line-clamp-6' : ''
-                  }`}>
-                    {extractedText}
+              <>
+                <div className="dark-card">
+                  <div className="px-4 py-2.5 border-b border-surface-border-subtle">
+                    <span className="text-xs font-medium text-text-secondary uppercase tracking-wider">提取文本</span>
+                  </div>
+                  <div className="p-4">
+                    <div className="text-text-primary text-sm leading-relaxed whitespace-pre-wrap">
+                      {extractedText}
+                    </div>
                   </div>
                 </div>
-              </div>
+
+                <button
+                  onClick={handleConfirmTranslate}
+                  disabled={isTranslating || !extractedText.trim()}
+                  className="w-full py-2.5 bg-accent text-white rounded-lg font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isTranslating ? '翻译中...' : '确认翻译'}
+                </button>
+              </>
             )}
 
             <TranslationPanel
