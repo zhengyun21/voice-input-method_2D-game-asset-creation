@@ -1,3 +1,5 @@
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { Language } from "../types";
 import { LANGUAGES, TARGET_LANGUAGES } from "../types";
 
@@ -21,32 +23,114 @@ type LanguageSelectorProps =
   | LanguageSelectorFullProps
   | LanguageSelectorTargetOnlyProps;
 
+interface DropdownProps {
+  options: { code: Language; label: string }[];
+  value: Language;
+  onChange: (lang: Language) => void;
+  disabled?: boolean;
+}
+
+const LanguageDropdown = ({ options, value, onChange, disabled }: DropdownProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const selectedOption = options.find((opt) => opt.code === value);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSelect = (lang: Language) => {
+    onChange(lang);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        ref={buttonRef}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        disabled={disabled}
+        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all ${
+          disabled
+            ? "opacity-50 cursor-not-allowed"
+            : isOpen
+            ? "bg-accent/15 text-accent"
+            : "bg-surface-elevated text-text-secondary hover:bg-surface-border hover:text-text-primary"
+        }`}
+      >
+        <span>{selectedOption?.label}</span>
+        <svg
+          className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+
+      {isOpen &&
+        !disabled &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className="fixed bg-surface-card border border-surface-border rounded-xl shadow-lg shadow-black/20 py-1.5 z-50 animate-fade-in-up"
+            style={{
+              top: buttonRef.current
+                ? buttonRef.current.getBoundingClientRect().bottom + 6
+                : 0,
+              left: buttonRef.current
+                ? buttonRef.current.getBoundingClientRect().left
+                : 0,
+              minWidth: buttonRef.current?.offsetWidth || 120,
+            }}
+          >
+            {options.map((opt) => (
+              <button
+                key={opt.code}
+                onClick={() => handleSelect(opt.code)}
+                className={`w-full px-3 py-2 text-left text-sm transition-colors ${
+                  opt.code === value
+                    ? "text-accent bg-accent/10"
+                    : "text-text-secondary hover:text-text-primary hover:bg-surface-elevated"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>,
+          document.body
+        )}
+    </div>
+  );
+};
+
 export const LanguageSelector = (props: LanguageSelectorProps) => {
   const { mode, targetLanguage, onTargetChange, disabled = false } = props;
-
-  const selectClass =
-    "dark-input text-sm py-1.5 appearance-none cursor-pointer pr-8 bg-[length:16px_16px] bg-[right_6px_center] bg-no-repeat";
-  const selectStyle = {
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E")`,
-  };
 
   if (mode === "target-only") {
     return (
       <div className="flex items-center gap-2">
         <span className="text-xs text-text-muted">翻译至</span>
-        <select
+        <LanguageDropdown
+          options={TARGET_LANGUAGES}
           value={targetLanguage}
-          onChange={(e) => onTargetChange(e.target.value as Language)}
+          onChange={onTargetChange}
           disabled={disabled}
-          className={selectClass}
-          style={selectStyle}
-        >
-          {TARGET_LANGUAGES.map((lang) => (
-            <option key={lang.code} value={lang.code}>
-              {lang.label}
-            </option>
-          ))}
-        </select>
+        />
       </div>
     );
   }
@@ -60,27 +144,20 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
 
   return (
     <div className="flex items-center gap-2">
-      <select
+      <LanguageDropdown
+        options={LANGUAGES}
         value={sourceLanguage}
-        onChange={(e) => onSourceChange(e.target.value as Language)}
+        onChange={onSourceChange}
         disabled={disabled}
-        className={selectClass}
-        style={selectStyle}
-      >
-        {LANGUAGES.map((lang) => (
-          <option key={lang.code} value={lang.code}>
-            {lang.label}
-          </option>
-        ))}
-      </select>
+      />
 
       <button
         onClick={handleSwap}
         disabled={disabled}
-        className={`p-1.5 rounded-md transition-colors ${
+        className={`p-1.5 rounded-lg transition-colors ${
           disabled
-            ? "text-text-muted cursor-not-allowed"
-            : "text-text-secondary hover:text-accent hover:bg-accent-muted"
+            ? "text-text-muted cursor-not-allowed opacity-50"
+            : "text-text-secondary hover:text-accent hover:bg-accent/10"
         }`}
       >
         <svg
@@ -98,19 +175,12 @@ export const LanguageSelector = (props: LanguageSelectorProps) => {
         </svg>
       </button>
 
-      <select
+      <LanguageDropdown
+        options={TARGET_LANGUAGES}
         value={targetLanguage}
-        onChange={(e) => onTargetChange(e.target.value as Language)}
+        onChange={onTargetChange}
         disabled={disabled}
-        className={selectClass}
-        style={selectStyle}
-      >
-        {TARGET_LANGUAGES.map((lang) => (
-          <option key={lang.code} value={lang.code}>
-            {lang.label}
-          </option>
-        ))}
-      </select>
+      />
     </div>
   );
 };

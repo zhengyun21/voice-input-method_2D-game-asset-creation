@@ -30,7 +30,7 @@ export const TranslationPageLayout = ({
   return (
     <div className="h-full flex flex-col">
       <header className="px-8 py-5 border-b border-surface-border-subtle flex-shrink-0">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-accent/10 rounded-lg flex items-center justify-center text-accent">
               {icon}
