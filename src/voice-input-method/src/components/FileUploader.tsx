@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { getAcceptedMimeTypes, formatFileSize } from '../services/documentParser';
+import { getAcceptedMimeTypes } from '../services/documentParser';
 
 interface FileUploaderProps {
   onFileSelect: (file: File) => void;
@@ -68,35 +68,6 @@ export const FileUploader = ({ onFileSelect, isProcessing }: FileUploaderProps) 
           <p className="text-xs text-text-muted">支持 .txt / .docx / .pdf / .pptx 格式</p>
         </div>
       </div>
-    </div>
-  );
-};
-
-interface FileInfoProps {
-  file: File;
-  onRemove: () => void;
-}
-
-export const FileInfo = ({ file, onRemove }: FileInfoProps) => {
-  const ext = file.name.split('.').pop()?.toUpperCase() || 'FILE';
-
-  return (
-    <div className="dark-card flex items-center gap-4 p-4">
-      <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-        <span className="text-xs font-semibold text-accent">{ext}</span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-text-primary truncate">{file.name}</p>
-        <p className="text-xs text-text-muted">{formatFileSize(file.size)}</p>
-      </div>
-      <button
-        onClick={onRemove}
-        className="p-1.5 text-text-muted hover:text-text-secondary hover:bg-surface-elevated rounded-md transition-colors"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
     </div>
   );
 };

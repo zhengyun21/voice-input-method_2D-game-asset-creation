@@ -30,7 +30,7 @@ function nearestSize(width: number, height: number): string {
   return `${best.w}x${best.h}`;
 }
 
-export type StepUpdateCallback = (steps: GenerationStep[]) => void;
+type StepUpdateCallback = (steps: GenerationStep[]) => void;
 
 function makeSteps(): GenerationStep[] {
   return [
@@ -132,16 +132,4 @@ export async function generateImage(
   }
 }
 
-export async function generateMultipleImages(
-  config: AssetConfig,
-  count: number
-): Promise<GeneratedAsset[]> {
-  const results: GeneratedAsset[] = [];
 
-  for (let i = 0; i < count; i++) {
-    const asset = await generateImage(config);
-    results.push(asset);
-  }
-
-  return results;
-}

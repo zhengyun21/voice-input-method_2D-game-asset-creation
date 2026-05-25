@@ -2,12 +2,6 @@ import mammoth from 'mammoth';
 import * as pdfjsLib from 'pdfjs-dist';
 import JSZip from 'jszip';
 
-const ACCEPTED_EXTENSIONS = ['.txt', '.docx', '.pdf', '.pptx'];
-
-export function getAcceptedExtensions(): string[] {
-  return ACCEPTED_EXTENSIONS;
-}
-
 export function getAcceptedMimeTypes(): string {
   return '.txt,.docx,.pdf,.pptx';
 }

@@ -95,19 +95,4 @@ select {
     @apply bg-surface-card border border-surface-border rounded-xl;
   }
 
-  .dark-input {
-    @apply bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-text-primary
-           focus:outline-none focus:border-accent
-           placeholder:text-text-muted transition-colors;
-    --tw-ring-color: var(--accent-glow);
-  }
-}
-
-@layer utilities {
-  .line-clamp-6 {
-    display: -webkit-box;
-    -webkit-line-clamp: 6;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
 }

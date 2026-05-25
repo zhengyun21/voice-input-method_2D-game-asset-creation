@@ -55,20 +55,6 @@ input[type="number"]::-webkit-outer-spin-button {
     @apply text-[11px] font-mono font-medium uppercase tracking-widest text-txt-tertiary mb-3;
   }
 
-  .control-surface {
-    @apply bg-surface-2 border border-edge rounded-lg;
-  }
-
-  .btn-ghost {
-    @apply px-3 py-1.5 text-sm font-medium text-txt-secondary rounded-md
-           hover:text-txt-primary hover:bg-surface-4 transition-colors duration-150;
-  }
-
-  .btn-primary {
-    @apply px-4 py-2 text-sm font-semibold text-txt-inverse bg-amber rounded-md
-           hover:bg-amber-bright transition-colors duration-150;
-  }
-
   .input-field {
     @apply w-full px-3 py-2 bg-surface-3 border border-edge rounded-lg
            text-sm text-txt-primary placeholder-txt-tertiary
