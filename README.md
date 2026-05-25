@@ -2,6 +2,8 @@
 
 双项目仓库，包含语音输入法和 2D 游戏素材生成工具，均基于 React + TypeScript + Vite + Tailwind CSS 构建。
 
+#项目演示链接：https://www.bilibili.com/video/BV1tVGR6KE9a/?vd_source=600f218b6168d7887c0463e0379e7050
+
 ## 📦 项目列表
 
 ### 🎤 voice-input-method（语音输入法）
