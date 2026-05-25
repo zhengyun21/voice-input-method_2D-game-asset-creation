@@ -4,27 +4,28 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
         surface: {
-          bg: '#09090b',
-          base: '#131316',
-          card: '#1a1a1f',
-          elevated: '#222228',
-          border: '#27272a',
-          'border-subtle': '#1f1f23',
+          bg: 'var(--surface-bg)',
+          base: 'var(--surface-base)',
+          card: 'var(--surface-card)',
+          elevated: 'var(--surface-elevated)',
+          border: 'var(--surface-border)',
+          'border-subtle': 'var(--surface-border-subtle)',
         },
         text: {
-          primary: '#fafafa',
-          secondary: '#71717a',
-          muted: '#52525b',
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          muted: 'var(--text-muted)',
         },
         accent: {
-          DEFAULT: '#f59e0b',
-          hover: '#fbbf24',
-          muted: 'rgba(245, 158, 11, 0.15)',
-          glow: 'rgba(245, 158, 11, 0.3)',
+          DEFAULT: 'var(--accent)',
+          hover: 'var(--accent-hover)',
+          muted: 'var(--accent-muted)',
+          glow: 'var(--accent-glow)',
         },
       },
       fontFamily: {

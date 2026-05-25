@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>语音输入法 — UI Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-start: #f8f6f3;
+  --bg-end: #fef3e2;
+  --card: rgba(255,255,255,0.72);
+  --card-hover: rgba(255,255,255,0.88);
+  --card-border: rgba(0,0,0,0.06);
+  --card-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+  --card-shadow-hover: 0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
+  --accent: #ff6b35;
+  --accent-light: rgba(255,107,53,0.12);
+  --accent-glow: rgba(255,107,53,0.3);
+  --blue: #0ea5e9;
+  --blue-light: rgba(14,165,233,0.1);
+  --green: #22c55e;
+  --text-primary: #1e1b18;
+  --text-secondary: #6b6560;
+  --text-muted: #a8a29e;
+  --border: rgba(0,0,0,0.06);
+  --input-bg: rgba(255,255,255,0.6);
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: linear-gradient(160deg, var(--bg-start) 0%, var(--bg-end) 50%, #fde8d0 100%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: -30%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255,107,53,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -20%;
+  left: -15%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(14,165,233,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+::selection {
+  background-color: rgba(255,107,53,0.2);
+  color: var(--text-primary);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseRing {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes waveBar {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes dotPulse {
+  0%, 80%, 100% { opacity: 0.2; }
+  40% { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-in {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-delay-1 { animation-delay: 0.1s; }
+.animate-delay-2 { animation-delay: 0.2s; }
+.animate-delay-3 { animation-delay: 0.3s; }
+.animate-delay-4 { animation-delay: 0.4s; }
+.animate-delay-5 { animation-delay: 0.5s; }
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(248,246,243,0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--accent), #ff8f5e);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(255,107,53,0.25);
+}
+
+.header-icon svg {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
+.header-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.header-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.recorder-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.recorder-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulse-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--accent-glow);
+  animation: pulseRing 1.5s cubic-bezier(0.215,0.61,0.355,1) infinite;
+  pointer-events: none;
+}
+
+.pulse-ring-delayed {
+  animation-delay: 0.5s;
+  border-color: rgba(255,107,53,0.15);
+}
+
+.recorder-btn {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+  z-index: 2;
+  outline: none;
+}
+
+.recorder-btn.idle {
+  background: linear-gradient(135deg, var(--accent), #ff8f5e);
+  box-shadow: 0 8px 32px rgba(255,107,53,0.3), 0 2px 8px rgba(255,107,53,0.2);
+}
+
+.recorder-btn.idle:hover {
+  transform: scale(1.06);
+  box-shadow: 0 12px 40px rgba(255,107,53,0.4), 0 4px 12px rgba(255,107,53,0.25);
+}
+
+.recorder-btn.idle:active {
+  transform: scale(0.97);
+}
+
+.recorder-btn.recording {
+  background: linear-gradient(135deg, #ff4d1a, var(--accent));
+  box-shadow: 0 0 48px rgba(255,107,53,0.4), 0 0 16px rgba(255,107,53,0.2);
+  animation: float 2s ease-in-out infinite;
+}
+
+.recorder-btn.processing {
+  background: var(--card);
+  border: 2px solid var(--border);
+  cursor: wait;
+  box-shadow: var(--card-shadow);
+}
+
+.recorder-btn svg {
+  width: 32px;
+  height: 32px;
+  color: white;
+}
+
+.recorder-btn.processing svg {
+  color: var(--text-muted);
+}
+
+.wave-bars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.wave-bar {
+  width: 3px;
+  height: 20px;
+  background: white;
+  border-radius: 2px;
+  animation: waveBar 1.2s ease-in-out infinite;
+}
+
+.dots-loading {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  animation: dotPulse 1.4s ease-in-out infinite;
+}
+
+.recorder-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recorder-time {
+  font-family: 'Outfit', monospace;
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  transition: color 0.3s;
+}
+
+.recorder-time.active {
+  color: var(--accent);
+}
+
+.recorder-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  transition: color 0.3s;
+}
+
+.recorder-label.active {
+  color: var(--accent);
+}
+
+.controls-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.controls-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-track {
+  width: 40px;
+  height: 22px;
+  background: #d6d3d1;
+  border-radius: 11px;
+  position: relative;
+  transition: background 0.3s;
+}
+
+.toggle-track.active {
+  background: var(--accent-light);
+}
+
+.toggle-thumb {
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.toggle-track.active .toggle-thumb {
+  left: 20px;
+  background: var(--accent);
+}
+
+.toggle-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+
+.toggle-wrapper:hover .toggle-label {
+  color: var(--text-primary);
+}
+
+.lang-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lang-select {
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 6px 32px 6px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-primary);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b6560' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+  background-size: 16px;
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.lang-select:hover {
+  border-color: rgba(255,107,53,0.3);
+  box-shadow: 0 2px 8px rgba(255,107,53,0.08);
+}
+
+.lang-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+}
+
+.swap-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--card);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.swap-btn:hover {
+  color: var(--accent);
+  background: var(--accent-light);
+  border-color: rgba(255,107,53,0.2);
+  transform: rotate(180deg);
+}
+
+.swap-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.clear-btn {
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 6px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-btn:hover {
+  color: var(--text-secondary);
+  background: var(--card-hover);
+  border-color: rgba(0,0,0,0.1);
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 640px) {
+  .panels { grid-template-columns: 1fr; }
+}
+
+.glass-card {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+.glass-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-header-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+.card-header-label .dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.card-header-label .dot.orange { background: var(--accent); }
+.card-header-label .dot.blue { background: var(--blue); }
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-action-btn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: 4px 10px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-muted);
+}
+
+.card-action-btn:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.card-action-btn.save {
+  color: var(--accent);
+}
+
+.card-action-btn.save:hover {
+  background: var(--accent-light);
+}
+
+.card-body {
+  padding: 16px;
+}
+
+.card-body .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 0;
+}
+
+.card-body .empty-state svg {
+  width: 32px;
+  height: 32px;
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.card-body .empty-state p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.card-body .content-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  cursor: text;
+  border-radius: 8px;
+  padding: 8px;
+  transition: background 0.2s;
+}
+
+.card-body .content-text:hover {
+  background: rgba(0,0,0,0.02);
+}
+
+.card-body textarea {
+  width: 100%;
+  height: 128px;
+  padding: 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  resize: none;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.card-body textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.card-body textarea:focus {
+  border-color: rgba(255,107,53,0.4);
+  box-shadow: 0 0 0 3px rgba(255,107,53,0.08);
+  background: rgba(255,255,255,0.8);
+}
+
+.translating-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.translating-indicator .dots {
+  display: flex;
+  gap: 3px;
+}
+
+.translating-indicator .dots .dot {
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+}
+
+.translating-indicator span {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.shimmer-loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+  gap: 3px;
+}
+
+.shimmer-bar {
+  width: 3px;
+  height: 16px;
+  background: linear-gradient(180deg, var(--accent), rgba(255,107,53,0.3));
+  border-radius: 2px;
+  animation: waveBar 1.2s ease-in-out infinite;
+}
+
+.hint-section {
+  text-align: center;
+  padding-top: 16px;
+}
+
+.hint-section p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.hint-section .hint-accent {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+footer {
+  padding: 32px 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+footer p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.state-switcher {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.state-switcher-title {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-align: center;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.state-btn {
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.state-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.state-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.badge.orange {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.badge.blue {
+  background: var(--blue-light);
+  color: var(--blue);
+}
+
+.badge.green {
+  background: rgba(34,197,94,0.1);
+  color: var(--green);
+}
+</style>
+</head>
+<body>
+
+<header class="animate-in">
+  <div class="header-inner">
+    <div class="header-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+      </svg>
+    </div>
+    <div>
+      <div class="header-title">语音输入法</div>
+      <div class="header-subtitle">Voice Input Method</div>
+    </div>
+    <div style="margin-left:auto; display:flex; gap:6px;">
+      <span class="badge orange">ASR</span>
+      <span class="badge blue">DeepSeek</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="recorder-section animate-in animate-delay-1">
+    <div class="recorder-wrapper" id="recorderWrapper">
+      <div class="pulse-ring" id="pulseRing1" style="display:none;"></div>
+      <div class="pulse-ring pulse-ring-delayed" id="pulseRing2" style="display:none;"></div>
+      <button class="recorder-btn idle" id="recorderBtn" onclick="toggleRecording()">
+        <svg id="micIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        </svg>
+        <div class="wave-bars" id="waveBars" style="display:none;">
+          <div class="wave-bar" style="animation-delay:0s;"></div>
+          <div class="wave-bar" style="animation-delay:0.15s;"></div>
+          <div class="wave-bar" style="animation-delay:0.3s;"></div>
+          <div class="wave-bar" style="animation-delay:0.45s;"></div>
+          <div class="wave-bar" style="animation-delay:0.6s;"></div>
+        </div>
+        <div class="dots-loading" id="dotsLoading" style="display:none;">
+          <div class="dot" style="animation-delay:0s;"></div>
+          <div class="dot" style="animation-delay:0.2s;"></div>
+          <div class="dot" style="animation-delay:0.4s;"></div>
+        </div>
+      </button>
+    </div>
+
+    <div class="recorder-status">
+      <span class="recorder-time" id="recorderTime">--:--</span>
+      <span class="recorder-label" id="recorderLabel">点击录音</span>
+    </div>
+  </div>
+
+  <div class="controls-section animate-in animate-delay-2">
+    <div class="controls-inner">
+      <label class="toggle-wrapper" onclick="toggleVoiceTranslation()">
+        <div class="toggle-track active" id="toggleTrack">
+          <div class="toggle-thumb"></div>
+        </div>
+        <span class="toggle-label">启用语音翻译</span>
+      </label>
+
+      <div class="lang-selector" id="langSelector">
+        <select class="lang-select" id="sourceLang">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+        </select>
+        <button class="swap-btn" onclick="swapLanguages()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+          </svg>
+        </button>
+        <select class="lang-select" id="targetLang">
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+
+      <button class="clear-btn" id="clearBtn" onclick="clearAll()" style="display:none;">清空</button>
+    </div>
+  </div>
+
+  <div class="panels animate-in animate-delay-3">
+    <div class="glass-card" id="transcriptCard">
+      <div class="card-header">
+        <span class="card-header-label"><span class="dot orange"></span>识别结果</span>
+        <div class="card-actions" id="transcriptActions">
+          <button class="card-action-btn" onclick="clearAll()">清空</button>
+        </div>
+      </div>
+      <div class="card-body" id="transcriptBody">
+        <div class="empty-state">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 11l5-5m0 0l5 5m-5-5v12" />
+          </svg>
+          <p>识别结果</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card" id="translationCard">
+      <div class="card-header">
+        <span class="card-header-label"><span class="dot blue"></span>翻译结果</span>
+        <div class="card-actions" id="translationActions">
+          <button class="card-action-btn" onclick="clearTranslation()" style="display:none;">清空</button>
+        </div>
+      </div>
+      <div class="card-body" id="translationBody">
+        <div class="empty-state">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 01-3.827-5.802" />
+          </svg>
+          <p>等待翻译</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint-section animate-in animate-delay-4">
+    <p>点击麦克风开始录音 · 再次点击结束并识别 · 识别结果可点击编辑</p>
+    <p>语音识别由 <span class="hint-accent">讯飞</span> 驱动 · 翻译由 <span class="hint-accent">DeepSeek</span> 驱动</p>
+  </div>
+</main>
+
+<footer class="animate-in animate-delay-5">
+  <p>语音输入法 · 讯飞 ASR + DeepSeek</p>
+</footer>
+
+<div class="state-switcher">
+  <div class="state-switcher-title">预览状态</div>
+  <button class="state-btn active" onclick="setState('idle')">空闲</button>
+  <button class="state-btn" onclick="setState('recording')">录音中</button>
+  <button class="state-btn" onclick="setState('processing')">识别中</button>
+  <button class="state-btn" onclick="setState('result')">有结果</button>
+  <button class="state-btn" onclick="setState('translating')">翻译中</button>
+  <button class="state-btn" onclick="setState('complete')">完成</button>
+</div>
+
+<script>
+let currentState = 'idle';
+let isRecording = false;
+let recordingTimer = null;
+let recordingSeconds = 0;
+let voiceTranslationEnabled = true;
+
+function setState(state) {
+  currentState = state;
+  document.querySelectorAll('.state-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const btn = document.getElementById('recorderBtn');
+  const micIcon = document.getElementById('micIcon');
+  const waveBars = document.getElementById('waveBars');
+  const dotsLoading = document.getElementById('dotsLoading');
+  const pulseRing1 = document.getElementById('pulseRing1');
+  const pulseRing2 = document.getElementById('pulseRing2');
+  const recorderTime = document.getElementById('recorderTime');
+  const recorderLabel = document.getElementById('recorderLabel');
+  const clearBtn = document.getElementById('clearBtn');
+
+  micIcon.style.display = 'none';
+  waveBars.style.display = 'none';
+  dotsLoading.style.display = 'none';
+  pulseRing1.style.display = 'none';
+  pulseRing2.style.display = 'none';
+  btn.className = 'recorder-btn';
+
+  if (recordingTimer) { clearInterval(recordingTimer); recordingTimer = null; }
+  recordingSeconds = 0;
+
+  switch(state) {
+    case 'idle':
+      btn.classList.add('idle');
+      micIcon.style.display = 'block';
+      recorderTime.textContent = '--:--';
+      recorderTime.classList.remove('active');
+      recorderLabel.textContent = '点击录音';
+      recorderLabel.classList.remove('active');
+      clearBtn.style.display = 'none';
+      setTranscriptEmpty();
+      setTranslationEmpty();
+      break;
+
+    case 'recording':
+      btn.classList.add('recording');
+      waveBars.style.display = 'flex';
+      pulseRing1.style.display = 'block';
+      pulseRing2.style.display = 'block';
+      recorderTime.textContent = '00:00';
+      recorderTime.classList.add('active');
+      recorderLabel.textContent = '录音中';
+      recorderLabel.classList.add('active');
+      isRecording = true;
+      recordingSeconds = 0;
+      recordingTimer = setInterval(() => {
+        recordingSeconds++;
+        const m = String(Math.floor(recordingSeconds / 60)).padStart(2, '0');
+        const s = String(recordingSeconds % 60).padStart(2, '0');
+        recorderTime.textContent = m + ':' + s;
+      }, 1000);
+      setTranscriptEmpty();
+      setTranslationEmpty();
+      break;
+
+    case 'processing':
+      btn.classList.add('processing');
+      dotsLoading.style.display = 'flex';
+      recorderTime.textContent = '--:--';
+      recorderTime.classList.remove('active');
+      recorderLabel.textContent = '识别中';
+      recorderLabel.classList.add('active');
+      break;
+
+    case 'result':
+      btn.classList.add('idle');
+      micIcon.style.display = 'block';
+      recorderTime.textContent = '--:--';
+      recorderTime.classList.remove('active');
+      recorderLabel.textContent = '点击录音';
+      recorderLabel.classList.remove('active');
+      clearBtn.style.display = 'block';
+      setTranscriptResult('今天天气真不错，我们一起去公园散步吧。阳光明媚，微风轻拂，是个非常适合户外活动的好日子。');
+      setTranslationEmpty();
+      break;
+
+    case 'translating':
+      btn.classList.add('idle');
+      micIcon.style.display = 'block';
+      recorderTime.textContent = '--:--';
+      recorderTime.classList.remove('active');
+      recorderLabel.textContent = '点击录音';
+      recorderLabel.classList.remove('active');
+      clearBtn.style.display = 'block';
+      setTranscriptResult('今天天气真不错，我们一起去公园散步吧。阳光明媚，微风轻拂，是个非常适合户外活动的好日子。');
+      setTranslationTranslating();
+      break;
+
+    case 'complete':
+      btn.classList.add('idle');
+      micIcon.style.display = 'block';
+      recorderTime.textContent = '--:--';
+      recorderTime.classList.remove('active');
+      recorderLabel.textContent = '点击录音';
+      recorderLabel.classList.remove('active');
+      clearBtn.style.display = 'block';
+      setTranscriptResult('今天天气真不错，我们一起去公园散步吧。阳光明媚，微风轻拂，是个非常适合户外活动的好日子。');
+      setTranslationResult('The weather is really nice today. Let\'s go for a walk in the park together. The sun is shining brightly with a gentle breeze — it\'s a perfect day for outdoor activities.');
+      break;
+  }
+}
+
+function setTranscriptEmpty() {
+  document.getElementById('transcriptBody').innerHTML = `
+    <div class="empty-state">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 11l5-5m0 0l5 5m-5-5v12" />
+      </svg>
+      <p>识别结果</p>
+    </div>`;
+  document.getElementById('transcriptActions').innerHTML = '<button class="card-action-btn" onclick="clearAll()">清空</button>';
+}
+
+function setTranscriptResult(text) {
+  document.getElementById('transcriptBody').innerHTML = `
+    <div class="content-text" onclick="editTranscript()">${text}</div>`;
+  document.getElementById('transcriptActions').innerHTML = `
+    <button class="card-action-btn" onclick="clearAll()">清空</button>`;
+}
+
+function setTranslationEmpty() {
+  document.getElementById('translationBody').innerHTML = `
+    <div class="empty-state">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 01-3.827-5.802" />
+      </svg>
+      <p>等待翻译</p>
+    </div>`;
+  document.getElementById('translationActions').innerHTML = '';
+}
+
+function setTranslationTranslating() {
+  document.getElementById('translationBody').innerHTML = `
+    <div class="shimmer-loading">
+      <div class="shimmer-bar" style="animation-delay:0s;"></div>
+      <div class="shimmer-bar" style="animation-delay:0.15s;"></div>
+      <div class="shimmer-bar" style="animation-delay:0.3s;"></div>
+      <div class="shimmer-bar" style="animation-delay:0.45s;"></div>
+      <div class="shimmer-bar" style="animation-delay:0.6s;"></div>
+    </div>`;
+  document.getElementById('translationActions').innerHTML = `
+    <div class="translating-indicator">
+      <div class="dots">
+        <div class="dot" style="animation-delay:0s;"></div>
+        <div class="dot" style="animation-delay:0.2s;"></div>
+        <div class="dot" style="animation-delay:0.4s;"></div>
+      </div>
+      <span>翻译中</span>
+    </div>`;
+}
+
+function setTranslationResult(text) {
+  document.getElementById('translationBody').innerHTML = `
+    <div class="content-text" style="animation: fadeInUp 0.5s ease-out forwards;">${text}</div>`;
+  document.getElementById('translationActions').innerHTML = `
+    <button class="card-action-btn" onclick="clearTranslation()">清空</button>`;
+}
+
+function toggleRecording() {
+  if (currentState === 'idle' || currentState === 'result' || currentState === 'complete') {
+    setState('recording');
+  } else if (currentState === 'recording') {
+    setState('processing');
+    setTimeout(() => setState('result'), 1500);
+  }
+}
+
+function toggleVoiceTranslation() {
+  voiceTranslationEnabled = !voiceTranslationEnabled;
+  const track = document.getElementById('toggleTrack');
+  const langSelector = document.getElementById('langSelector');
+  if (voiceTranslationEnabled) {
+    track.classList.add('active');
+    langSelector.style.display = 'flex';
+  } else {
+    track.classList.remove('active');
+    langSelector.style.display = 'none';
+  }
+}
+
+function swapLanguages() {
+  const source = document.getElementById('sourceLang');
+  const target = document.getElementById('targetLang');
+  const temp = source.value;
+  source.value = target.value;
+  target.value = temp;
+}
+
+function clearAll() {
+  setState('idle');
+}
+
+function clearTranslation() {
+  setTranslationEmpty();
+}
+
+function editTranscript() {
+  const body = document.getElementById('transcriptBody');
+  const currentText = body.querySelector('.content-text')?.textContent || '';
+  body.innerHTML = `
+    <textarea autofocus onblur="saveTranscript(this)">${currentText}</textarea>
+    <p style="margin-top:8px;font-size:12px;color:var(--text-muted);">点击外部保存编辑</p>`;
+  body.querySelector('textarea').focus();
+}
+
+function saveTranscript(textarea) {
+  const text = textarea.value.trim();
+  if (text) {
+    setTranscriptResult(text);
+  } else {
+    setTranscriptEmpty();
+  }
+}
+</script>
+
+</body>
+</html>

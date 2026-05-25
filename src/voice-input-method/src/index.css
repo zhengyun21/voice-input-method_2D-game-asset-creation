@@ -2,17 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --surface-bg: #f8f9fa;
+  --surface-base: #ffffff;
+  --surface-card: #ffffff;
+  --surface-elevated: #f1f3f5;
+  --surface-border: #e5e7eb;
+  --surface-border-subtle: #f1f3f5;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --accent: #f59e0b;
+  --accent-hover: #fbbf24;
+  --accent-muted: rgba(245, 158, 11, 0.15);
+  --accent-glow: rgba(245, 158, 11, 0.3);
+  --scrollbar-thumb: #d1d5db;
+  --scrollbar-thumb-hover: #9ca3af;
+}
+
+.dark {
+  --surface-bg: #09090b;
+  --surface-base: #131316;
+  --surface-card: #1a1a1f;
+  --surface-elevated: #222228;
+  --surface-border: #27272a;
+  --surface-border-subtle: #1f1f23;
+  --text-primary: #fafafa;
+  --text-secondary: #71717a;
+  --text-muted: #52525b;
+  --accent: #f59e0b;
+  --accent-hover: #fbbf24;
+  --accent-muted: rgba(245, 158, 11, 0.15);
+  --accent-glow: rgba(245, 158, 11, 0.3);
+  --scrollbar-thumb: #27272a;
+  --scrollbar-thumb-hover: #3f3f46;
+}
+
 * {
   box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
 }
 
 body {
   margin: 0;
   font-family: 'DM Sans', sans-serif;
-  background-color: #09090b;
-  color: #fafafa;
+  background-color: var(--surface-bg);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 button {
@@ -24,8 +65,8 @@ select {
 }
 
 ::selection {
-  background-color: rgba(245, 158, 11, 0.3);
-  color: #fafafa;
+  background-color: var(--accent-glow);
+  color: var(--text-primary);
 }
 
 ::-webkit-scrollbar {
@@ -37,12 +78,12 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--scrollbar-thumb);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: var(--scrollbar-thumb-hover);
 }
 
 @layer components {
@@ -52,7 +93,17 @@ select {
 
   .dark-input {
     @apply bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-text-primary
-           focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30
+           focus:outline-none focus:border-accent
            placeholder:text-text-muted transition-colors;
+    --tw-ring-color: var(--accent-glow);
+  }
+}
+
+@layer utilities {
+  .line-clamp-6 {
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
